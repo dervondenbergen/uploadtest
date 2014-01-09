@@ -1,0 +1,62 @@
+!!!
+html
+  head
+    title Upload
+    meta( charset="utf-8" )
+    meta( name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" )
+    style.
+      * {
+        font-size: 1em
+      }
+  body
+    form( action="/upload" enctype="multipart/form-data" method="post" )
+      input( type="text" name="name" placeholder="name")
+      input( type="text" name="os" placeholder="os")
+      input( type="text" name="browser" placeholder="browser")
+      input( type="file" name="upload" multiple )
+      input( type="hidden" name="nav")
+      input( type="submit" value="Upload" )
+    
+    // progress( min="0" max="100" value="0") 0% complete
+      
+    script.
+      var form = document.querySelector("form");
+      var submit = document.querySelector("input[type='submit']");
+      var files = document.querySelector("input[type='file']").files;
+      var hidden = document.querySelector("input[type='hidden']");
+      var progressBar = document.querySelector("progress");
+    
+      
+      submit.addEventListener("click", function (e) {
+      
+        e.preventDefault();
+        var formData = new FormData(form);
+
+        hidden.value = JSON.stringify(window.navigator.userAgent);
+        
+        for (var i = 0, file; file = files[i]; ++i) {
+          formData.append(file.name, file);
+        };
+    
+        form.reset();
+        
+        var xhr = new XMLHttpRequest() || new ActiveXObject( 'Microsoft.XMLHTTP' );
+        xhr.open("POST", form.action, true);
+        xhr.onload = function(e) {
+          if (this.status == 200) {
+            console.log(this.response);
+          }
+        };
+    
+        // xhr.upload.onprogress = function(e) {
+        //   if (e.lengthComputable) {
+        //     progressBar.value = (e.loaded / e.total) * 100;
+        //     progressBar.textContent = progressBar.value; // Fallback for unsupported browsers.
+        //   }
+        // };
+    
+        xhr.send(formData);
+        
+        return false;
+        
+      });
